@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Coupon, CouponDocument } from "../schema/coupon.schema";
-import { Model, ClientSession } from "mongoose";
+import { Model } from "mongoose";
 import { CreateCouponDto } from "../dto/create-coupon.dto";
 import { FindAllCouponDto } from "../dto/findall-coupon.dto";
 import { CouponDto } from "../dto/coupon.dto";
@@ -21,19 +21,6 @@ export class CouponDao {
   async create(createCouponDto: CreateCouponDto): Promise<CouponDto> {
     const coupon = await this.couponModel.create(createCouponDto);
     return this.toCouponDto(coupon);
-  }
-
-  async createWithSession(createCouponDto: CreateCouponDto, session: ClientSession): Promise<CouponDto> {
-    const [coupon] = await this.couponModel.create([createCouponDto], { session });
-    return this.toCouponDto(coupon);
-  }
-
-  async deleteWithSession(couponId: string, session: ClientSession): Promise<void> {
-    await this.couponModel.deleteOne({ couponId }, { session });
-  }
-
-  async delete(couponId: string): Promise<void> {
-    await this.couponModel.deleteOne({ couponId });
   }
 
   async findAll(findCouponDto: FindAllCouponDto): Promise<CouponDto[]> {
