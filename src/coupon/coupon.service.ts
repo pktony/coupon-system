@@ -8,12 +8,15 @@ import { CouponError, CouponExcepetion } from "./exception/coupon.exception";
 import { CreateCouponQuantityDto } from "./dto/create-coupon-quantity.dto";
 import { CouponDto } from "./dto/coupon.dto";
 import { CreateUserCouponDto } from "../user-coupon/dto/create-user-coupon.dto";
+import { InjectConnection } from "@nestjs/mongoose";
+import { Connection } from "mongoose";
 
 @Injectable()
 export class CouponService {
   constructor(
     private readonly couponDao: CouponDao,
-    private readonly couponQuantityDao: CouponQuantityDao
+    private readonly couponQuantityDao: CouponQuantityDao,
+    @InjectConnection() private readonly connection: Connection
   ) { }
 
   async getCoupon(findCouponDto: FindCouponDto) : Promise<CouponDto> {
@@ -50,17 +53,32 @@ export class CouponService {
       throw new CouponExcepetion(CouponError.DUPLICATE_COUPON);
     }
 
-    //TODO: add transaction
-    const coupon = await this.couponDao.create(createCouponDto);
-    const { quantity, ...couponDto } = createCouponDto;
-    const couponQuantityDto: CreateCouponQuantityDto = {
-      ...couponDto,
-      remainingCount: quantity
-    }
-    await this.couponQuantityDao.create(couponQuantityDto);
-    //TODO: add transaction
+    const session = await this.connection.startSession();
+    
+    try {
+      let coupon: CouponDto;
+      
+      // MongoDB 트랜잭션 시작
+      await session.withTransaction(async () => {
+        coupon = await this.couponDao.createWithSession(createCouponDto, session);
+      });
 
-    return coupon;
+      try {
+        const { quantity, ...couponDto } = createCouponDto;
+        const couponQuantityDto: CreateCouponQuantityDto = {
+          ...couponDto,
+          remainingCount: quantity
+        }
+        await this.couponQuantityDao.create(couponQuantityDto);
+      } catch (redisError) {
+        await this.couponDao.delete(createCouponDto.couponId);
+        throw redisError;
+      }
+
+      return coupon!;
+    } finally {
+      await session.endSession();
+    }
   }
 
   async issueCoupon(createUserCouponDto: CreateUserCouponDto) : Promise<void> {
