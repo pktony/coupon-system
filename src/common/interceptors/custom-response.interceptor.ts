@@ -17,7 +17,6 @@ export class ResponseInterceptor<T>
     context: ExecutionContext,
     next: CallHandler,
   ): Observable<ResponseDto<T>> {
-
     return next.handle().pipe(
       map((data): ResponseDto<T> => ({
         data: data,

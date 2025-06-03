@@ -11,11 +11,19 @@ export class UserService {
     return this.userDao.create(createUserDto);
   }
 
+  async createUsers(count: number): Promise<UserDto[]> {
+    return this.userDao.createUsers(count);
+  }
+
   async getUsers() : Promise<UserDto[]> {
     return this.userDao.findAll();
   }
 
   async getUser(id: string): Promise<UserDto | null> {
     return this.userDao.findById(id);
+  }
+
+  async deleteAll() {
+    return this.userDao.deleteAll();
   }
 }

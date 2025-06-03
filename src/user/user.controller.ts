@@ -1,7 +1,7 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post } from "@nestjs/common";
+import { Body, Controller, Get, HttpCode, HttpStatus, Param, Post, Query } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { CreateUserDto } from "./dto/create-user.dto";
-import { ApiOperation } from "@nestjs/swagger";
+import { ApiBody, ApiOperation } from "@nestjs/swagger";
 
 @Controller('users')
 export class UserController {
@@ -9,9 +9,17 @@ export class UserController {
 
   @Post()
   @HttpCode(HttpStatus.OK)
+  @ApiBody({ type: CreateUserDto, description: '유저 생성 정보' })
   @ApiOperation({ summary: '유저 생성' })
   async createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
+  }
+
+  @Post('random')
+  @HttpCode(HttpStatus.OK)
+  async createUsers(@Query('count') count: number) {
+    await this.userService.deleteAll();
+    return this.userService.createUsers(count);
   }
 
   @Get(':id')

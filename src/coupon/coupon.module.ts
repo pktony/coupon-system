@@ -34,5 +34,6 @@ import Redis from 'ioredis';
       }
     }
   ],
+  exports: [CouponService]
 })
 export class CouponModule {}

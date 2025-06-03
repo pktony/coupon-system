@@ -17,6 +17,17 @@ export class UserDao {
     return this.toUserDto(user);
   }
 
+  async createUsers(count: number): Promise<UserDto[]> {
+    const users: User[] = Array.from({ length: count }, (_, index) => ({
+      name: `User${index + 1}`,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    }));
+
+    const createdUsers = await this.userModel.insertMany(users);
+    return createdUsers.map((user) => this.toUserDto(user));
+  }
+
   async findById(id: string): Promise<UserDto | null> {
     const user = await this.userModel.findById(id).exec();
     if (!user) return null;
@@ -26,6 +37,10 @@ export class UserDao {
   async findAll(): Promise<UserDto[]> {
     const users = await this.userModel.find({});
     return users.map((user) => this.toUserDto(user));
+  }
+
+  async deleteAll(): Promise<void> {
+    await this.userModel.deleteMany({});
   }
 
   private toUserDto(user: UserDocument): UserDto {

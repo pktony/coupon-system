@@ -7,6 +7,7 @@ import { CreateCouponDto } from "./dto/create-coupon.dto";
 import { CouponError, CouponExcepetion } from "./exception/coupon.exception";
 import { CreateCouponQuantityDto } from "./dto/create-coupon-quantity.dto";
 import { CouponDto } from "./dto/coupon.dto";
+import { CreateUserCouponDto } from "../user-coupon/dto/create-user-coupon.dto";
 
 @Injectable()
 export class CouponService {
@@ -60,5 +61,9 @@ export class CouponService {
     //TODO: add transaction
 
     return coupon;
+  }
+
+  async issueCoupon(createUserCouponDto: CreateUserCouponDto) : Promise<void> {
+    await this.couponQuantityDao.decreaseRemainingCount(createUserCouponDto.couponId);
   }
 }
