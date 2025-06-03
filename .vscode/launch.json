@@ -16,6 +16,22 @@
             "console": "integratedTerminal",
             "restart": true,
             "autoAttachChildProcesses": true
-        }
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "[test] userCoupons",
+            "program": "${workspaceFolder}/node_modules/jest/bin/jest.js",
+            "args": [
+              "src/user-coupon/user-coupon.controller.spec.ts",
+              "--runInBand",
+              "--detectOpenHandles"
+            ],
+            "console": "integratedTerminal",
+            "internalConsoleOptions": "neverOpen",
+            "env": {
+              "TS_NODE_PROJECT": "tsconfig.json"
+            }
+          }
     ]
 }

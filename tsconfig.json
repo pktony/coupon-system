@@ -10,6 +10,12 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "./",
+    "paths": {
+      "@src/*": ["./src/*"],
+      "@user/*": ["./src/user/*"],
+      "@coupon/*": ["./src/coupon/*"],
+      "@user-coupon/*": ["./src/user-coupon/*"]
+    },
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
