@@ -8,6 +8,7 @@ async function bootstrap() {
   const docConfig = new DocumentBuilder()
     .setTitle('Coupon Service')
     .setVersion('0.1')
+    .addServer('/couponsystem/back')
     .build();
 
   const document = SwaggerModule.createDocument(app, docConfig);
