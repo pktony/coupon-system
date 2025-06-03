@@ -1,4 +1,4 @@
-import { Controller, Query } from "@nestjs/common";
+import { Controller, Get, Query } from "@nestjs/common";
 
 @Controller('user-coupons')
 export class UserCouponController {
