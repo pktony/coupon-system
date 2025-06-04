@@ -16,7 +16,7 @@ export class CouponService {
     private readonly couponQuantityDao: CouponQuantityDao
   ) { }
 
-  async getCoupon(findCouponDto: FindCouponDto) : Promise<CouponDto> {
+  async getCoupon(findCouponDto: FindCouponDto): Promise<CouponDto> {
     const coupon = await this.couponDao.findOne(findCouponDto.couponId);
     if (!coupon) {
       throw new CouponExcepetion(CouponError.INVALID_COUPON);
@@ -31,19 +31,19 @@ export class CouponService {
     return coupon;
   }
 
-  async getAllCoupons(findAllCouponDto: FindAllCouponDto) : Promise<CouponDto[]> {
+  async getAllCoupons(findAllCouponDto: FindAllCouponDto): Promise<CouponDto[]> {
     const coupons = await this.couponDao.findAll(findAllCouponDto);
     const couponIds = coupons.map(coupon => coupon.couponId);
-    
+
     const couponQuantities = await this.couponQuantityDao.findAll(couponIds);
     return coupons.map(coupon => {
       const couponQuantity = couponQuantities.find(quantity => quantity.couponId === coupon.couponId);
       return { ...coupon, remainingCount: couponQuantity?.remainingCount || 0 };
     });
-    
+
   }
 
-  async createCoupon(createCouponDto: CreateCouponDto) : Promise<CouponDto>{
+  async createCoupon(createCouponDto: CreateCouponDto): Promise<CouponDto> {
     const couponQuantity = await this.couponDao.findOne(createCouponDto.couponId);
 
     if (couponQuantity) {
@@ -63,7 +63,17 @@ export class CouponService {
     return coupon;
   }
 
-  async issueCoupon(createUserCouponDto: CreateUserCouponDto) : Promise<void> {
+  async issueCoupon(createUserCouponDto: CreateUserCouponDto): Promise<void> {
+    const remainingCount = await this.couponQuantityDao.getRemainingCount(createUserCouponDto.couponId);
+
+    if (remainingCount === null) {
+      throw new CouponExcepetion(CouponError.INVALID_COUPON);
+    }
+
+    if (remainingCount <= 0) {
+      throw new CouponExcepetion(CouponError.NO_COUPON_REMAINING);
+    }
+
     await this.couponQuantityDao.decreaseRemainingCount(createUserCouponDto.couponId);
   }
 }

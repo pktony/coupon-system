@@ -97,38 +97,11 @@ export class CouponQuantityDao {
     await this.redis.del(key);
   }
 
-  async decreaseRemainingCount(couponId: string): Promise<boolean> {
+  async decreaseRemainingCount(couponId: string): Promise<void> {
     const key = this.getKey(couponId);
     const updatedAt = new Date().toISOString();
 
-    const luaScript = `
-      local key = KEYS[1]
-      local updatedAt = ARGV[1]
-      
-      local current = redis.call('HGET', key, 'remainingCount')
-      if not current then
-        return 0  -- 쿠폰이 존재하지 않음
-      end
-      
-      local count = tonumber(current)
-      if count > 0 then
-        redis.call('HINCRBY', key, 'remainingCount', -1)
-        redis.call('HSET', key, 'updatedAt', updatedAt)
-        return 1  -- 성공
-      else
-        return -1  -- 수량 부족
-      end
-    `;
-
-    const result = await this.redis.eval(luaScript, 1, key, updatedAt) as number;
-    
-    if (result === 0) {
-      throw new CouponExcepetion(CouponError.INVALID_COUPON);
-    }
-    if (result === -1) {
-      throw new CouponExcepetion(CouponError.NO_COUPON_REMAINING);
-    }
-    
-    return true; // 성공
+    await this.redis.hincrby(key, 'remainingCount', -1);
+    await this.redis.hset(key, 'updatedAt', updatedAt);
   }
 }
