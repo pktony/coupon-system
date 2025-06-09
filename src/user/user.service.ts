@@ -12,11 +12,11 @@ export class UserService {
   }
 
   async createUsers(count: number): Promise<UserDto[]> {
-    return this.userDao.createUsers(count);
+  return this.userDao.createUsers(count);
   }
 
-  async getUsers() : Promise<UserDto[]> {
-    return this.userDao.findAll();
+  async getUsers(count: number) : Promise<UserDto[]> {
+    return this.userDao.findAll(count);
   }
 
   async getUser(id: string): Promise<UserDto | null> {

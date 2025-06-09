@@ -30,7 +30,7 @@ export class UserController {
 
   @Get()
   @ApiOperation({ summary: '유저 목록 조회' })
-  async getUsers() {
-    return this.userService.getUsers();
+  async getUsers(@Query('count') count: number) {
+    return this.userService.getUsers(count);
   }
 }

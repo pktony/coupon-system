@@ -12,4 +12,4 @@ export class User {
   createdAt: Date;
 }
 
-export const userSchema = SchemaFactory.createForClass(User);
+export const UserSchema = SchemaFactory.createForClass(User);

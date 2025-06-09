@@ -34,8 +34,8 @@ export class UserDao {
     return this.toUserDto(user);
   }
 
-  async findAll(): Promise<UserDto[]> {
-    const users = await this.userModel.find({});
+  async findAll(count: number): Promise<UserDto[]> {
+    const users = await this.userModel.find({}).limit(count);
     return users.map((user) => this.toUserDto(user));
   }
 
